@@ -5,7 +5,7 @@ import { Card, Box } from "rebass";
 import ToolbarWrapper from "./toolbar";
 
 const Preview = ({ markdown }) => (
-  <Box width={[1, 1 / 2]} maxWidth={1}>
+  <Box width={[1, 1, 1, 1 / 2]} maxWidth={1}>
     <ToolbarWrapper text="Previewer" />
     <Card style={{ minHeight: "82vh", maxHeight: "82vh" }}>
       <Markdown>{markdown}</Markdown>

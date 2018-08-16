@@ -4,7 +4,7 @@ import { Textarea, Box } from "rebass";
 import ToolbarWrapper from "./toolbar";
 
 const Editor = ({ onChange, markdown, onClick }) => (
-  <Box width={[1, 1 / 2]}>
+  <Box mr={2} width={[1, 1, 1, 0.4935]}>
     <ToolbarWrapper text="Editor" onClick={onClick} />
     <Textarea
       px={3}

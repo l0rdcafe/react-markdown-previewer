@@ -47,13 +47,12 @@ class App extends Component {
   };
   handleDelete = e => {
     const { markdownList } = this.state;
-    const list = [...markdownList];
     const { id } = e.target;
 
     if (/delete/.test(id)) {
       const i = id.substring(0, 1);
       console.log(i);
-      const slicedList = list.splice(i, 1);
+      const slicedList = markdownList.length > 1 ? markdownList.splice(i - 1, 1) : [];
 
       this.setState({ markdownList: [...slicedList] });
     }

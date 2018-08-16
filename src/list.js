@@ -1,9 +1,9 @@
 import React from "react";
 import { Box, Truncate, Code, Panel, Divider } from "rebass";
 import PropTypes from "prop-types";
-import { FaCode, FaTimes } from "react-icons/fa";
+import { FaCode, FaTimes, FaPlus } from "react-icons/fa";
 
-const List = ({ list, onClick, handlePick, handleDelete }) => (
+const List = ({ list, onClick, handlePick, handleDelete, handleAdd }) => (
   <Box mr={2} width={[1, 1, 1, 0.4935]}>
     <Panel>
       {list.map((text, i) => (
@@ -21,6 +21,7 @@ const List = ({ list, onClick, handlePick, handleDelete }) => (
         </div>
       ))}
     </Panel>
+    <FaPlus onClick={handleAdd} style={{ cursor: "pointer", margin: "0 auto", display: "block", marginTop: "2%" }} />
   </Box>
 );
 
@@ -28,7 +29,8 @@ List.propTypes = {
   list: PropTypes.arrayOf(PropTypes.string).isRequired,
   onClick: PropTypes.func.isRequired,
   handlePick: PropTypes.func.isRequired,
-  handleDelete: PropTypes.func.isRequired
+  handleDelete: PropTypes.func.isRequired,
+  handleAdd: PropTypes.func.isRequired
 };
 
 export default List;

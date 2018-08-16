@@ -8,7 +8,7 @@ import List from "./list";
 class App extends Component {
   constructor(props) {
     super(props);
-    const markdownList = [placeholder, `# Truth sayer`];
+    const markdownList = [placeholder, `# 2nd Markdown _File_`];
 
     this.state = {
       markdownList,
@@ -51,11 +51,27 @@ class App extends Component {
 
     if (/delete/.test(id)) {
       const i = id.substring(0, 1);
-      console.log(i);
-      const slicedList = markdownList.length > 1 ? markdownList.splice(i - 1, 1) : [];
+      let slicedList;
+
+      if (markdownList.length === 1) {
+        slicedList = [];
+      } else if (i === markdownList.length - 1) {
+        slicedList = markdownList.splice(0, markdownList.length - 1);
+      } else {
+        slicedList = [...markdownList.splice(0, i), ...markdownList.splice(i, markdownList.length)];
+      }
 
       this.setState({ markdownList: [...slicedList] });
     }
+  };
+  handleAdd = () => {
+    const { markdownList } = this.state;
+    const newList = [...markdownList, ""];
+    this.setState({
+      editEnabled: true,
+      markdownList: newList,
+      currFile: ""
+    });
   };
   render() {
     const { markdownList, editEnabled, currFile } = this.state;
@@ -73,6 +89,7 @@ class App extends Component {
               handleDelete={this.handleDelete}
               onClick={this.handleEdit}
               handlePick={this.handlePick}
+              handleAdd={this.handleAdd}
             />
           )}
           <Preview markdown={currFile} />

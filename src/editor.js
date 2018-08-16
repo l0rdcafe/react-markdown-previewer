@@ -12,7 +12,8 @@ const Editor = ({ onChange, markdown, onClick }) => (
       rows={24}
       defaultValue={markdown}
       onChange={onChange}
-      style={{ minHeight: "82vh", maxHeight: "82vh" }}
+      style={{ minHeight: "78vh", maxHeight: "81vh" }}
+      borderRadius={null}
     />
   </Box>
 );

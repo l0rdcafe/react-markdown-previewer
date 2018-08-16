@@ -7,7 +7,7 @@ import ToolbarWrapper from "./toolbar";
 const Preview = ({ markdown }) => (
   <Box width={[1, 1, 1, 1 / 2]} maxWidth={1}>
     <ToolbarWrapper text="Previewer" />
-    <Card style={{ minHeight: "82vh", maxHeight: "82vh" }}>
+    <Card style={{ minHeight: "78vh", maxHeight: "81vh" }}>
       <Markdown>{markdown}</Markdown>
     </Card>
   </Box>

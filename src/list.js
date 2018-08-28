@@ -10,7 +10,12 @@ const List = ({ list, onClick, handlePick, handleDelete, handleAdd }) => (
         <div>
           <Box p={4} bg="gray" key={text} onClick={handlePick} id={i}>
             <Code>
-              <FaTimes onClick={handleDelete} style={{ float: "right", cursor: "pointer" }} m={2} id={`${i}-delete`} />
+              <FaTimes
+                onClick={() => handleDelete(i)}
+                style={{ float: "right", cursor: "pointer" }}
+                m={2}
+                id={`${i}-delete`}
+              />
               <FaCode onClick={onClick} style={{ float: "right", cursor: "pointer" }} id={`${i}-edit`} />
               <Truncate onClick={handlePick} id={`${i}-edit2`}>
                 {text}

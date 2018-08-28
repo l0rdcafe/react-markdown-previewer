@@ -1,40 +1,46 @@
 import React, { Component } from "react";
 import { Heading, Container, Divider, Flex } from "rebass";
+import { connect } from "react-redux";
+import { ActionCreators } from "redux-undo";
+import { FaUndo } from "react-icons/fa";
 import placeholder from "./misc";
 import Editor from "./editor";
 import Preview from "./preview";
 import List from "./list";
+import { deleteNote, saveNote } from "./actions/notes";
 
 class App extends Component {
   constructor(props) {
     super(props);
-    const markdownList = [placeholder, `# 2nd Markdown _File_`];
-
     this.state = {
-      markdownList,
       editEnabled: false,
-      currFile: placeholder
+      isSaved: false,
+      currFile: placeholder,
+      currIdx: 0,
+      init: true
     };
   }
-  handleChange = e => {
-    const { value } = e.target;
-    const { markdownList, currFile } = this.state;
-    const i = markdownList.indexOf(currFile);
-    const slicedList = i > 0 ? markdownList.slice(0, i) : markdownList.slice(1, markdownList.length);
-    const newList = [...slicedList, value];
-    this.setState({ currFile: value, markdownList: newList });
+  handleChange = value => {
+    this.setState({ currFile: value, isSaved: false });
+  };
+  handleSave = (value, i) => {
+    this.props.dispatch(saveNote(value, i));
+    console.log(value, i);
+    this.setState({ isSaved: true, init: false });
   };
   handleEdit = e => {
     if (/edit/.test(e.target.id)) {
-      const { markdownList } = this.state;
+      const { notes } = this.props;
       const i = e.target.id.substring(0, 1);
-      const currFile = markdownList[i];
-      this.setState({ currFile, editEnabled: true });
+      const currFile = notes.present[i];
+      this.setState({ currFile, editEnabled: true, currIdx: Number(i) });
     }
   };
   handleClose = () => {
+    const currFile = this.state.currFile || this.props.notes.present[this.props.length - 1];
     this.setState({
-      editEnabled: false
+      editEnabled: false,
+      currFile
     });
   };
   handlePick = e => {
@@ -42,61 +48,68 @@ class App extends Component {
       return null;
     }
 
-    const currFile = this.state.markdownList[e.target.id] || this.state.currFile;
-    this.setState({ currFile });
+    const i = Number(e.target.id);
+    const currFile = this.props.notes.present[i] || this.state.currFile;
+    this.setState({ currFile, currIdx: i });
   };
-  handleDelete = e => {
-    const { markdownList } = this.state;
-    const { id } = e.target;
-
-    if (/delete/.test(id)) {
-      const i = id.substring(0, 1);
-      let slicedList;
-
-      if (markdownList.length === 1) {
-        slicedList = [];
-      } else if (i === markdownList.length - 1) {
-        slicedList = markdownList.splice(0, markdownList.length - 1);
-      } else {
-        slicedList = [...markdownList.splice(0, i), ...markdownList.splice(i, markdownList.length)];
-      }
-
-      this.setState({ markdownList: [...slicedList] });
-    }
+  handleDelete = i => {
+    this.props.dispatch(deleteNote(i));
+    this.setState({ init: false });
   };
   handleAdd = () => {
-    const { markdownList } = this.state;
-    const newList = [...markdownList, ""];
     this.setState({
       editEnabled: true,
-      markdownList: newList,
-      currFile: ""
+      currFile: "",
+      currIdx: this.props.notes.present.length,
+      init: false
     });
   };
+  handleUndo = () => {
+    this.props.dispatch(ActionCreators.undo());
+
+    if (this.props.notes.past.length === 1) {
+      this.setState({ init: true });
+    }
+  };
   render() {
-    const { markdownList, editEnabled, currFile } = this.state;
+    const { editEnabled, currFile, isSaved, currIdx, init } = this.state;
+    console.log(currIdx);
+    const { notes } = this.props;
+    const list = notes.present;
 
     return (
       <Container maxWidth={null}>
         <Heading textAlign="center">Markdown Previewer</Heading>
+        {!init && <FaUndo style={{ cursor: "pointer", marginLeft: "auto" }} onClick={this.handleUndo} />}
         <Divider w={1} borderColor="black" />
         <Flex flexWrap="wrap">
           {editEnabled ? (
-            <Editor onChange={this.handleChange} markdown={currFile} onClick={this.handleClose} />
+            <Editor
+              handleSave={() => this.handleSave(currFile, currIdx)}
+              onChange={e => this.handleChange(e.target.value)}
+              markdown={currFile}
+              onClick={this.handleClose}
+            />
           ) : (
             <List
-              list={markdownList}
+              list={list}
               handleDelete={this.handleDelete}
               onClick={this.handleEdit}
               handlePick={this.handlePick}
               handleAdd={this.handleAdd}
             />
           )}
-          <Preview markdown={currFile} />
+          <Preview markdown={currFile} isSaved={isSaved} editEnabled={editEnabled} />
         </Flex>
       </Container>
     );
   }
 }
 
-export default App;
+function mapStateToProps({ notes }) {
+  return {
+    notes
+  };
+}
+
+export default connect(mapStateToProps)(App);

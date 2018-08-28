@@ -1,27 +1,21 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Toolbar, NavLink } from "rebass";
-import { FaTimes } from "react-icons/fa";
+import { Toolbar } from "rebass";
 
-const ToolbarWrapper = ({ text, onClick }) => (
+const ToolbarWrapper = ({ text, children }) => (
   <Toolbar bg="blue">
     {text}
-    {onClick ? (
-      <NavLink onClick={onClick} ml="auto">
-        <FaTimes />
-      </NavLink>
-    ) : null}
+    {children}
   </Toolbar>
 );
 
 ToolbarWrapper.propTypes = {
   text: PropTypes.string,
-  onClick: PropTypes.func
+  children: PropTypes.arrayOf(null || PropTypes.object, null || PropTypes.object).isRequired
 };
 
 ToolbarWrapper.defaultProps = {
-  text: "Window",
-  onClick: null
+  text: "Window"
 };
 
 export default ToolbarWrapper;

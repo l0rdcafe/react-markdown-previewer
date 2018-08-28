@@ -25,7 +25,6 @@ class App extends Component {
   };
   handleSave = (value, i) => {
     this.props.dispatch(saveNote(value, i));
-    console.log(value, i);
     this.setState({ isSaved: true, init: false });
   };
   handleEdit = e => {
@@ -73,7 +72,6 @@ class App extends Component {
   };
   render() {
     const { editEnabled, currFile, isSaved, currIdx, init } = this.state;
-    console.log(currIdx);
     const { notes } = this.props;
     const list = notes.present;
 

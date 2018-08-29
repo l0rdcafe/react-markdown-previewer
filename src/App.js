@@ -3,44 +3,31 @@ import { Heading, Container, Divider, Flex } from "rebass";
 import { connect } from "react-redux";
 import { ActionCreators } from "redux-undo";
 import { FaUndo } from "react-icons/fa";
-import placeholder from "./misc";
+import PropTypes from "prop-types";
 import Editor from "./editor";
 import Preview from "./preview";
 import List from "./list";
-import { deleteNote, saveNote } from "./actions/notes";
+import { deleteNote, saveNote, changeNote, newNote, pickNote, editNote, undoNote, closeNote } from "./actions/notes";
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      editEnabled: false,
-      isSaved: false,
-      currFile: placeholder,
-      currIdx: 0,
-      init: true
-    };
-  }
   handleChange = value => {
-    this.setState({ currFile: value, isSaved: false });
+    this.props.dispatch(changeNote(value));
   };
   handleSave = (value, i) => {
     this.props.dispatch(saveNote(value, i));
-    this.setState({ isSaved: true, init: false });
   };
   handleEdit = e => {
     if (/edit/.test(e.target.id)) {
-      const { notes } = this.props;
+      const { notes } = this.props.state.present;
       const i = e.target.id.substring(0, 1);
-      const currFile = notes.present[i];
-      this.setState({ currFile, editEnabled: true, currIdx: Number(i) });
+      const currFile = notes[i];
+      this.props.dispatch(editNote(currFile, Number(i)));
     }
   };
   handleClose = () => {
-    const currFile = this.state.currFile || this.props.notes.present[this.props.length - 1];
-    this.setState({
-      editEnabled: false,
-      currFile
-    });
+    const { notes } = this.props.state.present;
+    const currFile = this.props.state.present.currFile || notes[notes.length - 1];
+    this.props.dispatch(closeNote(currFile));
   };
   handlePick = e => {
     if (/edit/.test(e.target.id)) {
@@ -48,32 +35,24 @@ class App extends Component {
     }
 
     const i = Number(e.target.id);
-    const currFile = this.props.notes.present[i] || this.state.currFile;
-    this.setState({ currFile, currIdx: i });
+    const currFile = this.props.state.present.notes[i] || this.props.state.present.currFile;
+    this.props.dispatch(pickNote(currFile, i));
   };
   handleDelete = i => {
     this.props.dispatch(deleteNote(i));
-    this.setState({ init: false });
   };
-  handleAdd = () => {
-    this.setState({
-      editEnabled: true,
-      currFile: "",
-      currIdx: this.props.notes.present.length,
-      init: false
-    });
+  handleAdd = e => {
+    this.props.dispatch(newNote());
   };
   handleUndo = () => {
     this.props.dispatch(ActionCreators.undo());
 
-    if (this.props.notes.past.length === 1) {
-      this.setState({ init: true });
+    if (this.props.state.past.length === 1) {
+      this.props.dispatch(undoNote(true));
     }
   };
   render() {
-    const { editEnabled, currFile, isSaved, currIdx, init } = this.state;
-    const { notes } = this.props;
-    const list = notes.present;
+    const { editEnabled, currFile, isSaved, currIdx, init, notes } = this.props.state.present;
 
     return (
       <Container maxWidth={null}>
@@ -90,7 +69,7 @@ class App extends Component {
             />
           ) : (
             <List
-              list={list}
+              list={notes}
               handleDelete={this.handleDelete}
               onClick={this.handleEdit}
               handlePick={this.handlePick}
@@ -104,10 +83,25 @@ class App extends Component {
   }
 }
 
-function mapStateToProps({ notes }) {
-  return {
-    notes
-  };
-}
+App.propTypes = {
+  state: PropTypes.shape({
+    future: PropTypes.arrayOf(PropTypes.object).isRequired,
+    history: PropTypes.shape({
+      past: PropTypes.arrayOf(PropTypes.object).isRequired
+    }),
+    past: PropTypes.arrayOf(PropTypes.object).isRequired,
+    present: PropTypes.shape({
+      currFile: PropTypes.string.isRequired,
+      editEnabled: PropTypes.bool.isRequired,
+      isSaved: PropTypes.bool.isRequired,
+      notes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+      init: PropTypes.bool.isRequired,
+      currIdx: PropTypes.number.isRequired
+    })
+  }).isRequired,
+  dispatch: PropTypes.func.isRequired
+};
+
+const mapStateToProps = ({ state }) => ({ state });
 
 export default connect(mapStateToProps)(App);

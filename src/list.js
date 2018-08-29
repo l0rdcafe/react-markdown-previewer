@@ -7,8 +7,8 @@ const List = ({ list, onClick, handlePick, handleDelete, handleAdd }) => (
   <Box mr={2} width={[1, 1, 1, 0.4935]}>
     <Panel>
       {list.map((text, i) => (
-        <div>
-          <Box p={4} bg="gray" key={text} onClick={handlePick} id={i}>
+        <div key={text}>
+          <Box p={4} bg="gray" onClick={handlePick} id={i}>
             <Code>
               <FaTimes
                 onClick={() => handleDelete(i)}
